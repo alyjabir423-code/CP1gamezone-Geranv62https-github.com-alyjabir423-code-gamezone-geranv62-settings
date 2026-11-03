@@ -1,10 +1,10 @@
 {
-  "name": "GameZone Bah V62 — Gérant",
-  "short_name": "GZ Gérant",
+  "name": "GameZone CP1 — GERANT",
+  "short_name": "CP1 Gérant",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "background_color": "#140e20",
   "theme_color": "#21152e",
-  "description": "GameZone Bah V62 — Gérant : comptes individuels, bonus fidélité, gymnastique, prises partagées et tarifs personnalisés."
+  "description": "GameZone CP1 · 7 postes · relais Firebase"
 }
