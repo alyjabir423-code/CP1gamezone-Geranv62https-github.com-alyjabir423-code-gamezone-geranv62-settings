@@ -418,7 +418,7 @@ button:focus-visible,.ni:focus-visible{outline:2px solid var(--gz-jaune);outline
 #gz-notify-btn{border-color:#a67d3e!important;background:#3e311d!important;color:#fde047!important}
 
 </style>
-<script src="./youssef-relay.js?v=cp1-commandes-1.1"></script></head>
+<script src="./youssef-relay.js?v=cp1-commandes-1.2"></script></head>
 <body>
 
 <div id="fb-loading" style="position:fixed;inset:0;background:#0d0d1a;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:900;gap:10px">
@@ -3931,9 +3931,9 @@ window.GymProofFree=(function(){
 })();
 </script>
 
-<script>CP1Relay.install({uid:()=>window.gzCP1Uid,token:()=>ensureFirebaseToken()});gzStorageSet('cp1_room_key','GZ-07732');
+<script>CP1Relay.install({uid:()=>window.gzCP1Uid,token:force=>force?refreshFirebaseIdToken():ensureFirebaseToken()});gzStorageSet('cp1_room_key','GZ-07732');
 
- document.title='GameZone CP1 — Gérant';const y=document.getElementById('gz-build-version');if(y)y.textContent='GZ-07732 COMPLET 05 · Relais Firebase local';</script><script>
+ document.title='GameZone CP1 — Gérant';const y=document.getElementById('gz-build-version');if(y)y.textContent='GZ-07732 CP1 1.2 · Temps sauvegardés jusqu’à 8 h';</script><script>
 // Les contrôles physiques précèdent la validation de la vente dans transaction().
 allumerPrise=async function(p){try{return await CP1Relay.ready(p);}catch(e){gzTuyaError=e.message;return false;}};
 eteindrePrise=async function(p){try{return await CP1Relay.safeOff(p);}catch(e){gzTuyaError=e.message;return false;}};
@@ -3941,7 +3941,8 @@ eteindrePrise=async function(p){try{return await CP1Relay.safeOff(p);}catch(e){g
 </script><script>
 const rootReadAutoY=rootReadActive;rootReadActive=function(root,p,i){const s=rootReadAutoY(root,p,i);return CP1Relay.applyPause(s,root?.auto_pauses?.[remotePostKey(p?.num)]);};
 const initAutoY=initApp;initApp=function(){DB._cache=CP1Relay.applyAuto(DB._cache);return initAutoY();};const refreshAutoY=refreshFromRemote;refreshFromRemote=function(){DB._cache=CP1Relay.applyAuto(DB._cache);return refreshAutoY();};
-</script><script src="./actions-v03.js?v=cp1-commandes-1.1"></script><script>const revisionRefreshY=refreshFromRemote;refreshFromRemote=function(){DB._cache=CP1Relay.acceptSnapshot(DB._cache);return revisionRefreshY();};</script><script src="pending-pause.js"></script>
+</script><script src="./actions-v03.js?v=cp1-commandes-1.2"></script><script>const revisionRefreshY=refreshFromRemote;refreshFromRemote=function(){DB._cache=CP1Relay.acceptSnapshot(DB._cache);return revisionRefreshY();};</script><script src="pending-pause.js"></script>
+<script src="./cp1-v12-ui.js?v=cp1-temps-1.2"></script>
 </body>
 </html>
 
