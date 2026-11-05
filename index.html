@@ -419,7 +419,7 @@ button:focus-visible,.ni:focus-visible{outline:2px solid var(--gz-jaune);outline
 #gz-notify-btn{border-color:#a67d3e!important;background:#3e311d!important;color:#fde047!important}
 
 </style>
-<script src="./youssef-relay.js?v=cp1-firebase-1.7"></script></head>
+<script src="./youssef-relay.js?v=cp1-sync-1.8"></script></head>
 <body>
 
 <div id="fb-loading" style="position:fixed;inset:0;background:#0d0d1a;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:900;gap:10px">
@@ -3934,9 +3934,10 @@ eteindrePrise=async function(p){try{return await CP1Relay.safeOff(p);}catch(e){g
 const rootReadAutoY=rootReadActive;rootReadActive=function(root,p,i){const s=rootReadAutoY(root,p,i);return CP1Relay.applyPause(s,root?.auto_pauses?.[remotePostKey(p?.num)]);};
 const initAutoY=initApp;initApp=function(){DB._cache=CP1Relay.applyAuto(DB._cache);return initAutoY();};const refreshAutoY=refreshFromRemote;refreshFromRemote=function(){DB._cache=CP1Relay.applyAuto(DB._cache);return refreshAutoY();};
 </script><script src="./actions-v03.js?v=cp1-boutons-1.6"></script><script>const revisionRefreshY=refreshFromRemote;refreshFromRemote=function(){DB._cache=CP1Relay.acceptSnapshot(DB._cache);return revisionRefreshY();};</script><script src="pending-pause.js"></script>
-<script src="./cp1-v12-ui.js?v=cp1-boutons-1.6"></script>
+<script src="./cp1-v12-ui.js?v=cp1-sync-1.8"></script>
 </body>
 </html>
+
 
 
 
