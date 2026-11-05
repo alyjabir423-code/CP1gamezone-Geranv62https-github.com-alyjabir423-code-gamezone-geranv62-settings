@@ -418,7 +418,7 @@ button:focus-visible,.ni:focus-visible{outline:2px solid var(--gz-jaune);outline
 #gz-notify-btn{border-color:#a67d3e!important;background:#3e311d!important;color:#fde047!important}
 
 </style>
-<script src="./youssef-relay.js?v=cp1-commandes-1.2"></script></head>
+<script src="./youssef-relay.js?v=expiration-1.4"></script></head>
 <body>
 
 <div id="fb-loading" style="position:fixed;inset:0;background:#0d0d1a;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:900;gap:10px">
@@ -3230,18 +3230,17 @@ async function gzFinishExpiredG(i,p){
   const snapshot={...p};
   p._ending=true;
   try{
-    if(!(await gzConfirmFinish16(snapshot,p)))return;
     const result=await fbRoot.transaction(root=>{
       root=root||{};
       const live=rootReadActive(root,snapshot,i)||{};
-      if(!live.actif||(sid&&live.sessionId!==sid)||!live.poweredOffAt||live.powerCutSessionId!==sid)return undefined;
+      if(!live.actif||(sid&&live.sessionId!==sid))return undefined;
       const now=Date.now();
       if(live.paused){if(Number(live.pauseRemainingSec||0)>0)return undefined;}
       else if(!Number(live.finTs)||Number(live.finTs)>now)return undefined;
       root.closed_sessions=root.closed_sessions||{};
       const alreadyClosed=!!(sid&&root.closed_sessions[sid]);
       const cleared=blankRemoteActive(live);
-      cleared.cleanup=true;cleared.cleanupUntil=now+20000;cleared.sessionId=sid;
+      cleared.cleanup=false;cleared.cleanupUntil=0;cleared.sessionId='';cleared.expiredSessionId=sid;cleared.powerUnverified=true;
       rootWriteActive(root,snapshot,i,cleared);
       const ss=freshSessionSnapshotFromRoot(root);
       if(!alreadyClosed&&!live.bonusOnly)ss.count=Math.max(0,Number(ss.count)||0)+1;
@@ -3253,16 +3252,11 @@ async function gzFinishExpiredG(i,p){
     });
     if(!result||!result.committed){if(fbForcePoll)await fbForcePoll();return;}
     syncFromTransactionResult(result);
-    // OFF déjà confirmé par le serveur : aucune seconde coupure tardive.
+    // Poste libéré dans Firebase ; extinction physique non affirmée sans retour de la prise.
     renderPostes();updateStats();
     gzSpeak('Temps terminé pour '+speechPosteName(snapshot.num)+'.');
-    gzTextVoiceNotify('GameZone — Fin de session',speechPosteName(snapshot.num)+' : temps terminé, télévision éteinte.','');
+    gzTextVoiceNotify('GameZone — Fin de session',speechPosteName(snapshot.num)+' : temps terminé, poste libre. État électrique à vérifier.','');
     addJournal('r',snapshot.num+' — Temps écoulé',(snapshot.client||'Client')+' · fin automatique',money(snapshot.montantSession)+' F','',{poste:snapshot.num,client:snapshot.client||'',sessionId:sid,typeActivite:'terminee_auto',tempsRestantSec:0,montant:money(snapshot.montantSession)});
-    try{await fbRoot.transaction(root=>{
-      root=root||{};const a=rootReadActive(root,snapshot,i)||{};
-      if(a.actif||!a.cleanup||a.sessionId!==sid)return undefined;
-      rootWriteActive(root,snapshot,i,{...a,cleanup:false,cleanupUntil:0,sessionId:'',updatedAt:Date.now()});return root;
-    });}catch(e){console.warn('Nettoyage fin de séance:',e);}
     if(fbForcePoll)await fbForcePoll();
   }catch(e){console.warn('Fin automatique poste:',e);showToast('⚠️ '+snapshot.num+' : fin Firebase à synchroniser');}
   finally{p._ending=false;}
@@ -3937,7 +3931,7 @@ window.GymProofFree=(function(){
 // Les contrôles physiques précèdent la validation de la vente dans transaction().
 allumerPrise=async function(p){try{return await CP1Relay.ready(p);}catch(e){gzTuyaError=e.message;return false;}};
 eteindrePrise=async function(p){try{return await CP1Relay.safeOff(p);}catch(e){gzTuyaError=e.message;return false;}};
-</script><script>const originalRestRootY=createRestRoot;createRestRoot=function(k){const r=originalRestRootY(k);r.child=p=>CP1Relay.child('gz_'+k+'/'+p);return r;};setInterval(()=>{if(typeof DB==='undefined'||!DB._cache)return;const incidents=DB._cache.operation_incidents||{};let box=document.getElementById('youssef-incidents');if(Object.keys(incidents).length){if(!box){box=document.createElement('div');box.id='youssef-incidents';box.style.cssText='padding:10px;background:#652438;color:#fff;font-size:12px';document.getElementById('gz-build-version')?.after(box);}box.textContent='⚠ Opération à vérifier : contrôler les prises et le rapport avant de refaire une vente.';}},3000);
+</script><script>const originalRestRootY=createRestRoot;createRestRoot=function(k){const r=originalRestRootY(k);r.child=p=>CP1Relay.child('gz_'+k+'/'+p);return r;};setInterval(()=>{if(typeof DB==='undefined'||!DB._cache)return;const incidents=DB._cache.operation_incidents||{};let box=document.getElementById('youssef-incidents');if(Object.keys(incidents).length){if(!box){box=document.createElement('div');box.id='youssef-incidents';box.style.cssText='padding:10px;background:#652438;color:#fff;font-size:12px';document.getElementById('gz-build-version')?.after(box);}const ids=Object.keys(incidents).sort().join('|');if(box.dataset.ids!==ids){box.dataset.ids=ids;box.replaceChildren();const details=document.createElement('details'),summary=document.createElement('summary');summary.textContent='⚠ '+Object.keys(incidents).length+' opération(s) à contrôler — détails';details.append(summary);const info=document.createElement('p');info.textContent='Une ancienne commande n’a pas reçu de confirmation. Vérifiez le poste et la recette avant de répéter une vente. La fin automatique du temps libère le poste.';details.append(info);box.append(details);}}},3000);
 </script><script>
 const rootReadAutoY=rootReadActive;rootReadActive=function(root,p,i){const s=rootReadAutoY(root,p,i);return CP1Relay.applyPause(s,root?.auto_pauses?.[remotePostKey(p?.num)]);};
 const initAutoY=initApp;initApp=function(){DB._cache=CP1Relay.applyAuto(DB._cache);return initAutoY();};const refreshAutoY=refreshFromRemote;refreshFromRemote=function(){DB._cache=CP1Relay.applyAuto(DB._cache);return refreshAutoY();};
@@ -3945,5 +3939,6 @@ const initAutoY=initApp;initApp=function(){DB._cache=CP1Relay.applyAuto(DB._cach
 <script src="./cp1-v12-ui.js?v=cp1-temps-1.2"></script>
 </body>
 </html>
+
 
 
