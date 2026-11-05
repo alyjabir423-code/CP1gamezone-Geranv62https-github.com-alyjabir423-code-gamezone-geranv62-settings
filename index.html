@@ -412,13 +412,14 @@ body{background:radial-gradient(ellipse at top left,rgba(236,72,153,.09),transpa
 .btn-resume,.ctl-resume{background:#294d3d;border:1px solid #68b98e;color:#dcfce7}
 .btn-plus,.ctl-plus,.btn-edit{background:#42233d;border-color:#a16793;color:#fbcfe8}
 .btn-ok{background:var(--gz-jaune);color:#332a08}
+.btn-cancel,.btn-start,.btn-pause,.btn-resume{background:var(--gz-jaune)!important;color:#332a08!important;border-color:#d9bc29!important}
 .ig input,.ig select{background:#1a1225;border-color:#765277;color:var(--text)}
 .ig input:focus,.ig select:focus{border-color:var(--gz-jaune);outline:2px solid rgba(253,224,71,.2);outline-offset:1px}
 button:focus-visible,.ni:focus-visible{outline:2px solid var(--gz-jaune);outline-offset:3px}
 #gz-notify-btn{border-color:#a67d3e!important;background:#3e311d!important;color:#fde047!important}
 
 </style>
-<script src="./youssef-relay.js?v=expiration-1.4"></script></head>
+<script src="./youssef-relay.js?v=cp1-gerant-1.5"></script></head>
 <body>
 
 <div id="fb-loading" style="position:fixed;inset:0;background:#0d0d1a;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:900;gap:10px">
@@ -2200,6 +2201,7 @@ async function confirmerSession(){
   let idx=-1,p=null,sid='',reserved=false,powered=false;
   try{
     if(!fbRoot)throw new Error('Connexion Firebase indisponible');
+    if(postes[modalPosteIdx])await CP1Relay.ready(postes[modalPosteIdx]);
     const latest=await fbRoot.once('value');
     syncFromTransactionResult({snapshot:latest});
     const nom=document.getElementById('ms-nom').value.trim();
@@ -3931,8 +3933,8 @@ eteindrePrise=async function(p){try{return await CP1Relay.safeOff(p);}catch(e){g
 </script><script>
 const rootReadAutoY=rootReadActive;rootReadActive=function(root,p,i){const s=rootReadAutoY(root,p,i);return CP1Relay.applyPause(s,root?.auto_pauses?.[remotePostKey(p?.num)]);};
 const initAutoY=initApp;initApp=function(){DB._cache=CP1Relay.applyAuto(DB._cache);return initAutoY();};const refreshAutoY=refreshFromRemote;refreshFromRemote=function(){DB._cache=CP1Relay.applyAuto(DB._cache);return refreshAutoY();};
-</script><script src="./actions-v03.js?v=cp1-commandes-1.2"></script><script>const revisionRefreshY=refreshFromRemote;refreshFromRemote=function(){DB._cache=CP1Relay.acceptSnapshot(DB._cache);return revisionRefreshY();};</script><script src="pending-pause.js"></script>
-<script src="./cp1-v12-ui.js?v=cp1-temps-1.2"></script>
+</script><script src="./actions-v03.js?v=cp1-gerant-1.5"></script><script>const revisionRefreshY=refreshFromRemote;refreshFromRemote=function(){DB._cache=CP1Relay.acceptSnapshot(DB._cache);return revisionRefreshY();};</script><script src="pending-pause.js"></script>
+<script src="./cp1-v12-ui.js?v=cp1-gerant-1.5"></script>
 </body>
 </html>
 
