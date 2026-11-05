@@ -1629,20 +1629,21 @@ async function doLogin(){
   if(!/^[a-z0-9_-]{2,24}$/.test(normalized)){
     err.textContent='Identifiant ou mot de passe incorrect.';return;
   }
-  let staffRecord;
+  let staffEmail;
   try{
-    const lookup=FIREBASE_DB_URL+'/staff_login/gz_'+encodeURIComponent(code)+'/'+encodeURIComponent(normalized)+'.json?ts='+Date.now();
+    const lookup=FIREBASE_DB_URL+'/staff_login/gz_'+encodeURIComponent(code)+'/'+encodeURIComponent(normalized)+'/email.json?ts='+Date.now();
     const response=await fetch(lookup,{cache:'no-store'});
-    if(!response.ok)throw Error('Accès aux comptes impossible : vérifiez les règles Firebase.');
-    staffRecord=await response.json();
-    if(!staffRecord || !staffRecord.uid || !staffRecord.email){err.textContent='Identifiant ou mot de passe incorrect.';return;}
-    if(staffRecord.enabled!==true){err.textContent='Ce compte Gérant est BLOQUÉ par le Patron.';return;}
+    if(!response.ok)throw Error('Connexion du gérant indisponible : les règles de connexion doivent être mises à jour.');
+    staffEmail=await response.json();
+    if(typeof staffEmail!=='string'||!staffEmail.endsWith('@staff.gamezone.example.com')){err.textContent='Identifiant ou mot de passe incorrect.';return;}
   }catch(e){err.textContent=e.message||'Vérification du compte impossible.';return;}
-  const email=staffRecord.email;
+  const email=staffEmail;
   err.textContent='';
   document.getElementById('fb-loading').style.display='flex';
   try{
     const auth=await firebaseEmailLogin(email,p);
+    const staffRecord=(await restFetchJson(restUrl('staff_login/gz_'+code+'/'+normalized))).data;
+    if(!staffRecord||staffRecord.enabled!==true)throw new Error('Ce compte Gérant est bloqué ou supprimé par le Patron.');
     if(auth.uid!==staffRecord.uid)throw new Error('Compte Gérant non autorisé pour cet identifiant.');
     const roomNode='gz_'+code;
     const access=await restFetchJson(restUrl('pilotage_v1/access/'+auth.uid+'/rooms/'+roomNode));
@@ -1722,14 +1723,9 @@ function gzStaffStartWatch(code,username,uid){
     if(!loggedIn||gzStaffWatchBusy||gzStaffWatchId!==identity)return;
     gzStaffWatchBusy=true;
     try{
-      const path=FIREBASE_DB_URL+'/staff_login/gz_'+encodeURIComponent(code)+'/'+encodeURIComponent(username)+'.json?check='+Date.now();
-      const response=await fetch(path,{cache:'no-store'});
-      if(!response.ok)return;
-      const record=await response.json();
+      const record=(await restFetchJson(restUrl('staff_login/gz_'+code+'/'+username))).data;
       if(gzStaffWatchId!==identity)return;
-      if(!record||record.enabled!==true||record.uid!==uid){
-        gzStaffLockedOut('🔒 Ton accès a été bloqué ou supprimé par le Patron.');return;
-      }
+      if(!record||record.enabled!==true||record.uid!==uid){gzStaffLockedOut('🔒 Ton accès a été bloqué ou supprimé par le Patron.');return;}
       const role=await restFetchJson(restUrl('pilotage_v1/access/'+uid+'/rooms/gz_'+code));
       if(gzStaffWatchId===identity&&role.data!=='gerant')gzStaffLockedOut('🔒 Autorisation Firebase retirée par le Patron.');
     }catch(e){
@@ -3939,6 +3935,7 @@ const initAutoY=initApp;initApp=function(){DB._cache=CP1Relay.applyAuto(DB._cach
 <script src="./cp1-v12-ui.js?v=cp1-temps-1.2"></script>
 </body>
 </html>
+
 
 
 
