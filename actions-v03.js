@@ -18,6 +18,10 @@ else{
  wrap('confirmerSession','Activation');wrap('confirmerPlus','Ajout du temps');
 }
 if(!patron){const hideReserved=()=>document.querySelectorAll('button[onclick*="gymFinishKeepingRevenueG"]').forEach(b=>b.hidden=true);new MutationObserver(hideReserved).observe(document.getElementById('app'),{childList:true,subtree:true});hideReserved();}
+
+for(const name of ['ownerRenderDashboard','ownerRenderReport','updateStats','renderRapport']){const original=w[name];if(typeof original==='function')w[name]=function(...args){const result=original.apply(this,args);CP1Relay.renderPhysical();return result;};}
+
 const style=document.createElement('style');style.textContent='[hidden]{display:none!important}.ms{overflow-y:auto;max-height:88dvh}button:disabled{opacity:.55;cursor:wait}';document.head.append(style);
 let day=CP1Relay.dayKey();setInterval(()=>{const current=CP1Relay.dayKey();if(current===day)return;day=current;if(patron){renderHome();ownerRenderReport();ownerRenderHistory();}else{updateStats();renderRapport();renderJournal();renderHistories();}},1000);
 })(window);
+
