@@ -2252,13 +2252,14 @@ async function confirmerSession(){
     });
     if(!tx||!tx.committed)throw new Error('Séance modifiée sur un autre téléphone, activation annulée');
     reserved=false;
+    closeModal('mo-start');
     syncFromTransactionResult(tx);
     const startTs=Date.now();
     addJournal('g',String(p.num)+' — Session démarrée',nom+' · Début '+fmtClock(startTs,true)+
       ' · '+duree+' min · '+payLbl,prix.toLocaleString('fr-FR')+' F','',
       {poste:p.num,client:nom,sessionId:sid,typeActivite:'demarrage',debutTs:startTs,dureeSec:duree*60,montant:prix});
     if(autoBonusStartG>0)addJournal('p',p.num+' — 🎁 Bonus automatique',nom+' · '+p.type+' · +'+autoBonusStartG+' minutes gratuites (0 F)','0 F','',{poste:p.num,client:nom,sessionId:sid,typeActivite:'bonus_auto',dureeAjouteeSec:autoBonusStartG*60,montant:0});
-    closeModal('mo-start');renderPostes();updateStats();
+    renderPostes();updateStats();
     announceSessionStartOnce(sid,p.num,duree,false);
     showToast('✅ '+p.num+' — prise Tuya ON confirmée, temps démarré. Vérifie que la TV sort de veille.');
     if(fbForcePoll)setTimeout(fbForcePoll,120);
@@ -3212,8 +3213,18 @@ window.addEventListener('hashchange',()=>{
   if(GZ_VALID_PAGES.includes(h)) activatePage(h,navItemForPage(h),false);
 });
 
-function openModal(id){document.getElementById(id).classList.add('open');}
-function closeModal(id){document.getElementById(id).classList.remove('open');}
+function openModal(id){
+  const modal=document.getElementById(id);if(!modal)return;
+  modal.hidden=false;modal.style.removeProperty('display');modal.setAttribute('aria-hidden','false');modal.classList.add('open');
+}
+function closeModal(id){
+  const modal=document.getElementById(id);if(!modal)return;
+  if(modal.contains(document.activeElement))document.activeElement?.blur();
+  modal.classList.remove('open');modal.hidden=true;modal.style.display='none';modal.setAttribute('aria-hidden','true');
+  // Commit the visibility change even when the mobile keyboard/compositor is idle.
+  void modal.offsetHeight;
+  requestAnimationFrame(()=>{if(!modal.classList.contains('open'))modal.style.display='none';});
+}
 document.querySelectorAll('.mo').forEach(el=>{el.addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');});});
 
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
@@ -3955,6 +3966,7 @@ const initAutoY=initApp;initApp=function(){DB._cache=CP1Relay.applyAuto(DB._cach
 <script src="./cp1-expiry.js?v=1.0"></script>
 </body>
 </html>
+
 
 
 
