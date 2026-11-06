@@ -419,7 +419,7 @@ button:focus-visible,.ni:focus-visible{outline:2px solid var(--gz-jaune);outline
 #gz-notify-btn{border-color:#a67d3e!important;background:#3e311d!important;color:#fde047!important}
 
 </style>
-<script src="./youssef-relay.js?v=postes-1-cp1-local-1.8"></script></head>
+<script src="./youssef-relay.js?v=association-1-postes-1-cp1-local-1.8"></script></head>
 <body>
 
 <div id="fb-loading" style="position:fixed;inset:0;background:#0d0d1a;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:900;gap:10px">
@@ -1070,7 +1070,7 @@ function gzSharedPlugOccupant(root, poste, idx){
   const all=Array.isArray(root.postes)?root.postes:[];
   for(let j=0;j<all.length;j++){
     const other=all[j];
-    if(!other||j===idx||String(other.num||'')===String(poste.num||'')||String(other.devid||'').trim()!==id)continue;
+    if(!other||j===idx||String(other.num||'')===String(poste.num||'')||!CP1Relay.samePlug(poste,other))continue;
     const st=rootReadActive(root,other,j)||{};
     if(Number(st.pausePendingUntil)>Date.now()||st.actif||(st.starting&&Date.now()<Number(st.startingUntil||0))||(st.cleanup&&Date.now()<Number(st.cleanupUntil||0)))return other;
   }
@@ -1078,7 +1078,7 @@ function gzSharedPlugOccupant(root, poste, idx){
 }
 function gzSharedPlugPartners(poste){
   const id=String(poste&&poste.devid||'').trim();
-  return id?(postes||[]).filter(x=>x&&String(x.num||'')!==String(poste.num||'')&&String(x.devid||'').trim()===id):[];
+  return id?(postes||[]).filter(x=>x&&String(x.num||'')!==String(poste.num||'')&&CP1Relay.samePlug(poste,x)):[];
 }
 async function gzSafeToSwitchOffShared(poste){
   if(!gzSharedPlugPartners(poste).length)return true;
@@ -3953,7 +3953,7 @@ window.GymProofFree=(function(){
 
 <script>CP1Relay.install({uid:()=>window.gzCP1Uid,token:force=>force?refreshFirebaseIdToken():ensureFirebaseToken()});gzStorageSet('cp1_room_key','GZ-07732');
 
- document.title='GameZone CP1 — Gérant';const y=document.getElementById('gz-build-version');if(y)y.textContent='GZ-07732 CP1 1.2 · Temps sauvegardés jusqu’à 8 h';</script><script>
+ document.title='GameZone CP1 — Gérant';const y=document.getElementById('gz-build-version');if(y)y.textContent='GZ-07732 CP1 1.9 · Association prises · Temps sauvegardés jusqu’à 8 h';</script><script>
 // Les contrôles physiques précèdent la validation de la vente dans transaction().
 allumerPrise=async function(p){try{return await CP1Relay.ready(p);}catch(e){gzTuyaError=e.message;return false;}};
 eteindrePrise=async function(p){try{return await CP1Relay.safeOff(p);}catch(e){gzTuyaError=e.message;return false;}};
@@ -3967,6 +3967,7 @@ const initAutoY=initApp;initApp=function(){DB._cache=CP1Relay.applyAuto(DB._cach
 <script src="./cp1-expiry.js?v=1.0"></script>
 </body>
 </html>
+
 
 
 
