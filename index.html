@@ -1541,56 +1541,8 @@ try{
   }
 }catch(e){}
 
-function gzSpeak(text,attempt=0){
-  try{
-    const msg=String(text||'').trim();
-    if(!msg) return false;
-    if(!('speechSynthesis' in window) || typeof SpeechSynthesisUtterance==='undefined'){
-      console.log('Synthèse vocale non disponible dans ce navigateur');
-      return false;
-    }
-    gzPrimeVoice();
-    const synth=window.speechSynthesis;
-    if(gzVoiceRetryTimer){clearTimeout(gzVoiceRetryTimer);gzVoiceRetryTimer=null;}
+function gzSpeak(text,attempt=0){return false;}
 
-    const u=new SpeechSynthesisUtterance(msg);
-    const v=gzFrenchVoice();
-    if(!v){console.warn('GameZone: aucune voix masculine sélectionnée — bouton 🎙️ pour choisir.');return false;}
-    u.voice=v;u.lang=v.lang||'fr-FR';
-    u.rate=.90;u.pitch=.83;u.volume=1;
-    gzVoiceUtterance=u;
-    let started=false;
-
-    u.onstart=function(){started=true;};
-    u.onend=function(){if(gzVoiceUtterance===u)gzVoiceUtterance=null;};
-    u.onerror=function(ev){
-      console.log('Annonce vocale erreur:',ev&&ev.error);
-      if(attempt<1 && ev && ev.error!=='canceled' && ev.error!=='interrupted'){
-        gzVoiceRetryTimer=setTimeout(function(){gzSpeak(msg,attempt+1);},350);
-      }
-    };
-
-    try{synth.cancel();}catch(e){}
-    try{synth.resume();}catch(e){}
-    setTimeout(function(){
-      try{
-        synth.resume();
-        synth.speak(u);
-        setTimeout(function(){
-          try{
-            if(synth.paused)synth.resume();
-            if(!started && !synth.speaking && attempt<2){
-              gzVoiceRetryTimer=setTimeout(function(){gzSpeak(msg,attempt+1);},120);
-            }
-          }catch(e){}
-        },650);
-      }catch(e){
-        if(attempt<2)gzVoiceRetryTimer=setTimeout(function(){gzSpeak(msg,attempt+1);},350);
-      }
-    },70);
-    return true;
-  }catch(e){console.log('Annonce vocale indisponible:',e);return false;}
-}
 function voiceStartKey(sessionId){return 'gz_voice_start_'+String(currentTenantKey||'')+'_'+String(sessionId||'');}
 function voiceFiveKey(sessionId,cycle){return 'gz_voice_5min_'+String(currentTenantKey||'')+'_'+String(sessionId||'')+'_'+String(Number(cycle)||0);}
 function markExistingVoiceSession(p){
@@ -3963,10 +3915,11 @@ const rootReadAutoY=rootReadActive;rootReadActive=function(root,p,i){const s=roo
 const initAutoY=initApp;initApp=function(){DB._cache=CP1Relay.applyAuto(DB._cache);return initAutoY();};const refreshAutoY=refreshFromRemote;refreshFromRemote=function(){DB._cache=CP1Relay.applyAuto(DB._cache);return refreshAutoY();};
 </script><script src="./actions-v03.js?v=cp1-boutons-1.6"></script><script>const revisionRefreshY=refreshFromRemote;refreshFromRemote=function(){DB._cache=CP1Relay.acceptSnapshot(DB._cache);return revisionRefreshY();};</script><script src="pending-pause.js"></script>
 <script src="./cp1-v12-ui.js?v=cp1-sync-1.8"></script>
-<script src="./cp1-feedback.js?v=2.0"></script>
+<script src="./cp1-feedback.js?v=click-only-20261107"></script>
 <script src="./cp1-expiry.js?v=1.0"></script>
 </body>
 </html>
+
 
 
 
