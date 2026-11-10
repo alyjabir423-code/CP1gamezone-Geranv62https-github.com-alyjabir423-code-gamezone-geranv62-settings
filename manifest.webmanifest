@@ -1,10 +1,10 @@
 {
-  "name": "GameZone CP1 — GERANT",
+  "name": "GameZone CP1 — Gérant",
   "short_name": "CP1 Gérant",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "background_color": "#140e20",
   "theme_color": "#21152e",
-  "description": "GameZone CP1 · 7 postes · relais Firebase"
+  "description": "GameZone CP1 · six prises · relais Firebase"
 }
